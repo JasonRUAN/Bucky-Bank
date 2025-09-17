@@ -1,0 +1,24 @@
+# BuckyBank 索引器配置文件示例
+# 复制此文件为 config.toml 并根据实际情况修改配置
+
+[database]
+url = "postgresql://postgres:password@localhost:5432/bucky_bank"
+max_connections = 10
+min_connections = 2
+connection_timeout_seconds = 30
+
+[sui]
+rpc_url = "https://fullnode.mainnet.sui.io:443"
+# 必须配置的包ID
+package_id = "YOUR_PACKAGE_ID_HERE"
+module_name = "bucky_bank"
+query_limit = 50
+
+[server]
+host = "127.0.0.1"
+port = 8080
+
+[indexing]
+poll_interval_seconds = 30
+batch_size = 100
+max_retries = 3
