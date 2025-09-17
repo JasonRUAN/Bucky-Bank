@@ -6,3 +6,5 @@ dist
 *.db
 */output.txt
 .idea
+config.toml
+cmd.sh
