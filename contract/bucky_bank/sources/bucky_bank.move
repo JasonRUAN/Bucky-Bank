@@ -1,5 +1,5 @@
 /// Module: bucky_bank
-/// 存钱罐合约
+/// 一个家长管理的儿童存钱罐智能合约
 module bucky_bank::bucky_bank;
 
 use std::string::{Self, String};
@@ -70,10 +70,14 @@ public struct GlobalStats has key {
 /// 事件定义
 public struct BuckyBankCreated has copy, drop {
     bucky_bank_id: ID,
+    name: String,
     parent: address,
     child: address,
     target_amount: u64,
+    created_at_ms: u64,
     deadline_ms: u64,
+    duration_days: u64,
+    current_balance_value: u64,
 }
 
 public struct DepositMade has copy, drop {
@@ -198,10 +202,14 @@ public fun create_bucky_bank(
     // 发送事件
     event::emit(BuckyBankCreated {
         bucky_bank_id: object::id(&bucky_bank),
+        name: name_str,
         parent: sender,
         child: child_address,
         target_amount,
+        created_at_ms: current_time_ms,
         deadline_ms,
+        duration_days,
+        current_balance_value: balance::value(&bucky_bank.current_balance),
     });
 
     // 将存钱罐设置为共享对象，家长和孩子都能进行操作
