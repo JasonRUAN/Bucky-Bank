@@ -7,10 +7,14 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS bucky_bank_created_events (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     bucky_bank_id VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
     parent_address VARCHAR(255) NOT NULL,
     child_address VARCHAR(255) NOT NULL,
     target_amount BIGINT NOT NULL,
+    created_at_ms BIGINT NOT NULL,
     deadline_ms BIGINT NOT NULL,
+    duration_days BIGINT NOT NULL,
+    current_balance_value BIGINT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -35,6 +39,7 @@ CREATE INDEX idx_cursor_event_seq ON cursors(event_seq);
 -- 添加注释
 COMMENT ON TABLE bucky_bank_created_events IS 'BuckyBank创建事件记录表';
 COMMENT ON COLUMN bucky_bank_created_events.bucky_bank_id IS 'BuckyBank唯一标识符';
+COMMENT ON COLUMN bucky_bank_created_events.name IS '存钱罐名称';
 COMMENT ON COLUMN bucky_bank_created_events.parent_address IS '父账户地址';
 COMMENT ON COLUMN bucky_bank_created_events.child_address IS '子账户地址';
 COMMENT ON COLUMN bucky_bank_created_events.target_amount IS '目标金额';

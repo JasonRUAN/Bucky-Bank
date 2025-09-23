@@ -18,17 +18,24 @@ pub mod models {
         pub parent_address: String,
         pub child_address: String,
         pub target_amount: i64,
+        pub created_at_ms: i64,
         pub deadline_ms: i64,
+        pub duration_days: i64,
+        pub current_balance_value: i64,
         pub created_at: DateTime<Utc>,
     }
 
     #[derive(Debug, Serialize, Deserialize)]
     pub struct NewBuckyBankCreatedEvent {
         pub bucky_bank_id: String,
+        pub name: String,
         pub parent_address: String,
         pub child_address: String,
         pub target_amount: i64,
+        pub created_at_ms: i64,
         pub deadline_ms: i64,
+        pub duration_days: i64,
+        pub current_balance_value: i64,
     }
 
     #[derive(Debug, FromRow, Serialize, Deserialize)]
@@ -74,17 +81,21 @@ impl Database {
         let result = sqlx::query_as::<_, models::BuckyBankCreatedEvent>(
             r#"
             INSERT INTO bucky_bank_created_events (
-                bucky_bank_id, parent_address, child_address,
-                target_amount, deadline_ms
-            ) VALUES ($1, $2, $3, $4, $5)
+                bucky_bank_id, name, parent_address, child_address,
+                target_amount, created_at_ms, deadline_ms, duration_days, current_balance_value
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             RETURNING *
             "#,
         )
         .bind(&event.bucky_bank_id)
+        .bind(&event.name)
         .bind(&event.parent_address)
         .bind(&event.child_address)
         .bind(event.target_amount)
+        .bind(event.created_at_ms)
         .bind(event.deadline_ms)
+        .bind(event.duration_days)
+        .bind(event.current_balance_value)
         .fetch_one(&self.pool)
         .await?;
 

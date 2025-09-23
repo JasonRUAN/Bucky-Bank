@@ -223,6 +223,11 @@ impl BuckyBankIndexer {
             .and_then(|v| v.as_str())
             .ok_or_else(|| anyhow::anyhow!("Missing bucky_bank_id"))?;
 
+        let name = parsed_data
+            .get("name")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| anyhow::anyhow!("Missing bucky bank name"))?;
+
         let parent_address = parsed_data
             .get("parent")
             .and_then(|v| v.as_str())
@@ -239,18 +244,40 @@ impl BuckyBankIndexer {
             .and_then(|s| s.parse::<u64>().ok())
             .ok_or_else(|| anyhow::anyhow!("Missing or invalid target_amount"))?;
 
+        let created_at_ms = parsed_data
+            .get("created_at_ms")
+            .and_then(|v| v.as_str())
+            .and_then(|s| s.parse::<u64>().ok())
+            .ok_or_else(|| anyhow::anyhow!("Missing or invalid created_at_ms"))?;
+
         let deadline_ms = parsed_data
             .get("deadline_ms")
             .and_then(|v| v.as_str())
             .and_then(|s| s.parse::<u64>().ok())
             .ok_or_else(|| anyhow::anyhow!("Missing or invalid deadline_ms"))?;
 
+        let duration_days = parsed_data
+            .get("duration_days")
+            .and_then(|v| v.as_str())
+            .and_then(|s| s.parse::<u64>().ok())
+            .ok_or_else(|| anyhow::anyhow!("Missing or invalid duration_days"))?;
+
+        let current_balance_value = parsed_data
+            .get("current_balance_value")
+            .and_then(|v| v.as_str())
+            .and_then(|s| s.parse::<u64>().ok())
+            .ok_or_else(|| anyhow::anyhow!("Missing or invalid current_balance_value"))?;
+
         let new_event = NewBuckyBankCreatedEvent {
             bucky_bank_id: bucky_bank_id.to_string(),
+            name: name.to_string(),
             parent_address: parent_address.to_string(),
             child_address: child_address.to_string(),
             target_amount: target_amount as i64,
+            created_at_ms: created_at_ms as i64,
             deadline_ms: deadline_ms as i64,
+            duration_days: duration_days as i64,
+            current_balance_value: current_balance_value as i64,
         };
 
         match self.db.save_bucky_bank_created_event(&new_event).await {
