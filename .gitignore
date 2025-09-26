@@ -8,3 +8,4 @@ dist
 .idea
 config.toml
 *.sh
+target
