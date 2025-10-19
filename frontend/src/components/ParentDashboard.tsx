@@ -10,7 +10,9 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useCreateBuckyBank } from "@/mutations/create_bucky_bank";
-import { useGetBuckyBanksByParent } from "@/hooks/useGetBuckyBank";
+import { useGetBuckyBanksByParent } from "@/hooks/dbhooks/useGetBuckyBank";
+import { useGetParentPendingRequests } from "@/hooks/dbhooks/useGetParentPendingRequests";
+import WithdrawalApprovalPanel from "@/components/WithdrawalApprovalPanel";
 import type { BuckyBankInfo, BuckyBankCreatedEvent } from "@/types";
 
 interface PiggyBank {
@@ -38,14 +40,16 @@ const transformBuckyBankData = (buckyBanks: BuckyBankCreatedEvent[]): PiggyBank[
     return buckyBanks.map((bank) => ({
         id: bank.bucky_bank_id,
         name: bank.name,
-        targetAmount: bank.target_amount / 1_000_000_000, // 从MIST转换为SUI
+        // targetAmount: bank.target_amount / 1_000_000_000, // 从MIST转换为SUI
+        targetAmount: bank.target_amount / 1_000_000, // USDC
         durationDays: bank.duration_days,
         parentAddress: bank.parent_address,
         childAddress: bank.child_address,
         createdAt: bank.created_at_ms,
         deadline: bank.deadline_ms,
-        currentAmount: bank.current_balance_value / 1_000_000_000, // 从MIST转换为SUI
-        status: bank.current_balance_value >= bank.target_amount ? "completed" :
+        // currentAmount: bank.current_balance / 1_000_000_000, // 从MIST转换为SUI
+        currentAmount: bank.current_balance / 1_000_000, // USDC
+        status: bank.current_balance >= bank.target_amount ? "completed" :
                 (Date.now() > bank.created_at_ms + bank.duration_days * 24 * 60 * 60 * 1000) ? "expired" : "active"
     }));
 };
@@ -71,15 +75,33 @@ export default function ParentDashboard() {
         currentAccount?.address || "",
         {
             enabled: !!currentAccount?.address,
-            refetchInterval: 30000, // 30秒自动刷新
+            refetchInterval: 5000, // 30秒自动刷新
         }
     );
 
     // 转换数据格式
     const piggyBanks = buckyBanksResponse?.data ? transformBuckyBankData(buckyBanksResponse.data) : [];
 
+    // 获取所有存钱罐的ID用于查询待审批请求
+    const buckyBankIds = piggyBanks.map(bank => bank.id);
+    
+    // 获取待审批的提取请求
+    const { 
+        data: pendingRequests = [], 
+        isLoading: isPendingRequestsLoading,
+        refetch: refetchPendingRequests 
+    } = useGetParentPendingRequests(
+        currentAccount?.address || "",
+        buckyBankIds,
+        {
+            enabled: !!currentAccount?.address && buckyBankIds.length > 0,
+            refetchInterval: 5000, // 30秒自动刷新
+        }
+    );
+
     console.log("AAA:", JSON.stringify(buckyBanksResponse?.data, null, 2));
     console.log("BBB:", JSON.stringify(piggyBanks, null, 2));
+    console.log("Pending Requests:", JSON.stringify(pendingRequests, null, 2));
 
     const handleInputChange = (
         field: keyof CreatePiggyBankForm,
@@ -186,7 +208,8 @@ export default function ParentDashboard() {
             // 构造BuckyBankInfo数据
             const buckyBankInfo: BuckyBankInfo = {
                 name: formData.name.trim(),
-                target_amount: Math.floor(parseFloat(formData.targetAmount) * 1_000_000_000), // 转换为MIST单位
+                // target_amount: Math.floor(parseFloat(formData.targetAmount) * 1_000_000_000), // 转换为MIST单位
+                target_amount: Math.floor(parseFloat(formData.targetAmount) * 1_000_000), // USDC
                 duration_days: parseInt(formData.durationDays),
                 child_address: formData.childAddress.trim(),
             };
@@ -209,6 +232,9 @@ export default function ParentDashboard() {
 
                 // 开始定时重新获取数据，直到获取到新数据
                 startPeriodicRefetch(10, 2000); // 最多尝试10次，每2秒一次
+                
+                // 同时刷新待审批请求
+                refetchPendingRequests();
 
             } catch (error) {
                 console.error("创建存钱罐失败:", error);
@@ -264,6 +290,18 @@ export default function ParentDashboard() {
 
     return (
         <div className="flex flex-col items-center justify-start min-h-[70vh] p-8 gap-6">
+            {/* 审批组件 - 只有在有待审批请求时才显示 */}
+            {pendingRequests.length > 0 && (
+                <WithdrawalApprovalPanel 
+                    pendingRequests={pendingRequests}
+                    isLoading={isPendingRequestsLoading}
+                    onRefresh={() => {
+                        refetchPendingRequests();
+                        refetch(); // 同时刷新存钱罐数据
+                    }}
+                />
+            )}
+
             {/* 创建存钱罐卡片 */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -308,7 +346,7 @@ export default function ParentDashboard() {
                                     htmlFor="targetAmount"
                                     className="text-sm font-medium text-slate-700"
                                 >
-                                    目标金额 (SUI) *
+                                    目标金额 (USDC) *
                                 </Label>
                                 <Input
                                     id="targetAmount"
@@ -488,7 +526,7 @@ export default function ParentDashboard() {
                                                                     {
                                                                         bank.targetAmount
                                                                     }{" "}
-                                                                    SUI
+                                                                    USDC
                                                                 </span>
                                                             </div>
                                                             <div>
@@ -497,7 +535,7 @@ export default function ParentDashboard() {
                                                                     {
                                                                         bank.currentAmount
                                                                     }{" "}
-                                                                    SUI (
+                                                                    USDC (
                                                                     {progress.toFixed(
                                                                         1
                                                                     )}

@@ -1,18 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import ChildPiggyBank from "./ChildPiggyBank";
 import ParentDashboard from "./ParentDashboard";
 import { ConnectButton } from "@mysten/dapp-kit";
 
-interface WalletState {
-    connected: boolean;
-    address: string;
-    balance: number;
-}
+// interface WalletState {
+//     connected: boolean;
+//     address: string;
+//     balance: number;
+// }
 
 export default function PiggyBank() {
     const [activeTab, setActiveTab] = useState<"child" | "parent">("child");

@@ -1,7 +1,8 @@
 import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { createNetworkConfig } from "@mysten/dapp-kit";
 
-export const ACTIVE_NETWORK = "testnet";
+// export const ACTIVE_NETWORK = "testnet";
+export const ACTIVE_NETWORK = "mainnet";
 
 const { networkConfig } = createNetworkConfig({
     testnet: { url: getFullnodeUrl("testnet") },
@@ -9,7 +10,8 @@ const { networkConfig } = createNetworkConfig({
 });
 
 const suiClient = new SuiClient({
-    url: networkConfig.testnet.url,
+    // url: networkConfig.testnet.url,
+    url: networkConfig.mainnet.url,
 });
 
 export { networkConfig, suiClient };

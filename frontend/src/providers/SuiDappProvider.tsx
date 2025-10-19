@@ -12,7 +12,8 @@ export default function SuiDappProvider({ children }: { children: ReactNode }) {
         <QueryClientProvider client={queryClient}>
             <SuiClientProvider
                 networks={networkConfig}
-                defaultNetwork="testnet"
+                // defaultNetwork="testnet"
+                defaultNetwork="mainnet"
             >
                 <WalletProvider autoConnect>{children}</WalletProvider>
             </SuiClientProvider>

@@ -5,7 +5,6 @@ import type {
     BuckyBankResponse, 
     BuckyBankSingleResponse, 
     BuckyBankQueryParams,
-    BuckyBankCreatedEvent 
 } from "@/types";
 
 /**

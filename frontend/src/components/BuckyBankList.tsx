@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGetBuckyBanks, useGetBuckyBanksByParent } from "@/hooks/useGetBuckyBank";
+import { useGetBuckyBanks, useGetBuckyBanksByParent } from "@/hooks/dbhooks/useGetBuckyBank";
 import type { BuckyBankQueryParams } from "@/types";
 
 export function BuckyBankList() {
@@ -118,7 +118,7 @@ export function BuckyBankList() {
                                             <span className="font-medium">BuckyBank ID:</span> {bank.bucky_bank_id}
                                         </p>
                                         <p className="text-sm text-gray-600 mb-1">
-                                            <span className="font-medium">目标金额:</span> {bank.target_amount.toLocaleString()} SUI
+                                            <span className="font-medium">目标金额:</span> {bank.target_amount.toLocaleString()} USDC
                                         </p>
                                         <p className="text-sm text-gray-600">
                                             <span className="font-medium">截止时间:</span> {new Date(bank.deadline_ms).toLocaleString()}

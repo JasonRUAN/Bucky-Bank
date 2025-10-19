@@ -4,7 +4,7 @@ import { Transaction } from "@mysten/sui/transactions";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { CONSTANTS } from "../constants";
 import type { BuckyBankInfo } from "@/types";
-import { useTransactionExecution } from "@/hooks/useTransactionExecution";
+import { useTransactionExecution } from "@/hooks/suihooks/useTransactionExecution";
 
 export function useCreateBuckyBank() {
     const account = useCurrentAccount();
@@ -20,13 +20,14 @@ export function useCreateBuckyBank() {
 
             for (const info of infos) {
                 tx.moveCall({
-                    target: CONSTANTS.BUCKY_BANK_CONTRACT.TARGET_CREATE_BUCKY_BANK,
+                    target: CONSTANTS.BUCKY_BANK_CONTRACT
+                        .TARGET_CREATE_BUCKY_BANK,
                     arguments: [
+                        tx.object(CONSTANTS.BUCKY_BANK_CONTRACT.GLOBAL_STATS_SHARED_OBJECT_ID),
                         tx.pure.string(info.name),
                         tx.pure.u64(info.target_amount),
                         tx.pure.u64(info.duration_days),
                         tx.pure.address(info.child_address),
-                        tx.pure.bool(true),
                         tx.object(CLOCK_OBJECT_ID),
                     ],
                 });
