@@ -125,6 +125,9 @@ impl Config {
     }
 
     pub fn development() -> Self {
+        // 加载 .env 文件
+        dotenvy::dotenv().ok();
+        
         Self {
             database: DatabaseConfig {
                 url: env::var("DATABASE_URL").unwrap_or_else(|_| {

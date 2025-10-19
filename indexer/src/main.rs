@@ -7,6 +7,7 @@ use tracing::{Instrument, error, info, info_span};
 
 mod config;
 mod database;
+mod handlers;
 mod health;
 mod indexer;
 mod logging;
@@ -59,6 +60,8 @@ async fn main() -> Result<()> {
         info!("Loading development configuration");
         Config::development()
     };
+
+    info!("Configuration loaded, db: {}", config.database.url);
 
     match cli.command.unwrap_or(Commands::Run) {
         Commands::Index => {

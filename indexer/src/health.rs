@@ -1,7 +1,8 @@
-use axum::{extract::State, http::StatusCode, response::Json, routing::get, Router};
+use axum::{extract::State, http::StatusCode, response::Json, routing::{get, put}, Router};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use crate::database::Database;
+use crate::handlers;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HealthResponse {
@@ -28,6 +29,18 @@ pub fn health_routes(state: HealthState) -> Router {
         .route("/health", get(health_check))
         .route("/ready", get(readiness_check))
         .route("/live", get(liveness_check))
+        // 提取请求相关API
+        .route("/api/withdrawal-requests/:request_id", get(handlers::get_withdrawal_request_by_id))
+        .route("/api/withdrawal-requests/bank/:bucky_bank_id", get(handlers::get_withdrawal_requests_by_bank_id))
+        .route("/api/withdrawal-requests/requester/:requester", get(handlers::get_withdrawal_requests_by_requester))
+        .route("/api/withdrawal-requests/status", get(handlers::get_withdrawal_requests_by_status))
+        .route("/api/withdrawal-requests/stats", get(handlers::get_withdrawal_requests_stats))
+        .route("/api/withdrawal-requests/:request_id/status", put(handlers::update_withdrawal_request_status))
+        // EventWithdrawed 事件相关API
+        .route("/api/event-withdrawed/:request_id", get(handlers::get_event_withdrawed_by_request_id))
+        .route("/api/event-withdrawed/bank/:bucky_bank_id", get(handlers::get_event_withdrawed_by_bank_id))
+        .route("/api/event-withdrawed/withdrawer/:withdrawer", get(handlers::get_event_withdrawed_by_withdrawer))
+        .route("/api/event-withdrawed/stats", get(handlers::get_event_withdrawed_stats))
         .with_state(state)
 }
 
