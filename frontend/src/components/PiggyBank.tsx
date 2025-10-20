@@ -6,12 +6,6 @@ import ChildPiggyBank from "./ChildPiggyBank";
 import ParentDashboard from "./ParentDashboard";
 import { ConnectButton } from "@mysten/dapp-kit";
 
-// interface WalletState {
-//     connected: boolean;
-//     address: string;
-//     balance: number;
-// }
-
 export default function PiggyBank() {
     const [activeTab, setActiveTab] = useState<"child" | "parent">("child");
 

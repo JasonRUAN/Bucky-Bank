@@ -1,11 +1,7 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api";
 import { QueryKey } from "@/constants";
-import type {
-    WithdrawalRequestResponse,
-    WithdrawalRequestQueryParams,
-    WithdrawalRequest
-} from "@/types";
+import type { WithdrawalRequestResponse } from "@/types";
 
 /**
  * Hook to get approved withdrawal requests for a specific requester
@@ -20,11 +16,16 @@ export function useGetApprovedWithdrawalRequests(
     }
 ): UseQueryResult<WithdrawalRequestResponse, Error> {
     return useQuery({
-        queryKey: [QueryKey.GetWithdrawalRequestsByRequester, requester, { status: 'Approved' }],
-        queryFn: () => apiClient.getWithdrawalRequestsByRequester(requester, { 
-            status: 'Approved',
-            limit: 100 // Get all approved requests
-        }),
+        queryKey: [
+            QueryKey.GetWithdrawalRequestsByRequester,
+            requester,
+            { status: "Approved" },
+        ],
+        queryFn: () =>
+            apiClient.getWithdrawalRequestsByRequester(requester, {
+                status: "Approved",
+                limit: 100, // Get all approved requests
+            }),
         enabled: (options?.enabled ?? true) && !!requester,
         refetchInterval: options?.refetchInterval ?? 30 * 1000, // Check every 30 seconds
         staleTime: options?.staleTime ?? 10 * 1000, // 10 seconds
@@ -48,7 +49,9 @@ export function useHasApprovedWithdrawalRequests(
 
     // 计算派生状态
     const hasApproved = query.data?.success && query.data.data.length > 0;
-    const approvedAmount = query.data?.success ? query.data.data.reduce((sum, req) => sum + req.amount, 0) : 0;
+    const approvedAmount = query.data?.success
+        ? query.data.data.reduce((sum, req) => sum + req.amount, 0)
+        : 0;
     const approvedRequests = query.data?.success ? query.data.data.length : 0;
     const approvedRequestsList = query.data?.success ? query.data.data : [];
 
