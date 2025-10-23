@@ -17,6 +17,10 @@
 
 https://moverse.wal.app/
 
+## 演示视频
+
+https://drive.google.com/file/d/1t-dy4RtLpLwzeUtvANFeiPUnoEPdCwWS/view?usp=sharing
+
 ## 架构设计
 
 ![](./assets/BuckyBank%E6%A0%B8%E5%BF%83%E6%B5%81%E7%A8%8B.svg)
